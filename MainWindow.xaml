@@ -62,6 +62,10 @@
             <Image Name="Image" Width="640" Height="480"/>
         </Viewbox>
         <CheckBox Grid.Row="2" Style="{StaticResource SquareCheckBox}" Content="Seated Mode" Height="Auto" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0 10 10 10" Name="checkBoxSeatedMode" Checked="CheckBoxSeatedModeChanged" Unchecked="CheckBoxSeatedModeChanged"/>
+        <Button Content="Start" HorizontalAlignment="Left" Margin="495,12,0,0" Grid.Row="2" VerticalAlignment="Top" Width="75" Click="StartRecordingClicked"/>
+        <Button Content="Stop" HorizontalAlignment="Left" Margin="575,12,0,0" Grid.Row="2" VerticalAlignment="Top" Width="75" Click="StopRecordingClicked"/>
+        <Button Content="Save" HorizontalAlignment="Left" Margin="657,12,0,0" Grid.Row="2" VerticalAlignment="Top" Width="75" Click="SaveRecordingClicked"/>
+        <Label Content="Recording" HorizontalAlignment="Left" Margin="426,10,0,0" Grid.Row="2" VerticalAlignment="Top" Background="{x:Null}"/>
         <StatusBar Grid.Row="3" HorizontalAlignment="Stretch" Name="statusBar" VerticalAlignment="Bottom" Background="White" Foreground="{StaticResource MediumGreyBrush}">
             <StatusBarItem Padding="0 0 0 10">
                 <TextBlock Name="statusBarText" Margin="-1 0 0 0">Click 'Seated' to change skeletal pipeline type!</TextBlock>

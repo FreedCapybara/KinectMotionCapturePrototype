@@ -371,5 +371,20 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 }
             }
         }
+
+        private void StartRecordingClicked(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void StopRecordingClicked(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void SaveRecordingClicked(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
