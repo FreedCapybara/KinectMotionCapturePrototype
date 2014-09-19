@@ -10,6 +10,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
     using System.Windows;
     using System.Windows.Media;
     using Microsoft.Kinect;
+    using System.Windows.Controls;
 
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -80,6 +81,15 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// Drawing image that we will display
         /// </summary>
         private DrawingImage imageSource;
+
+        // recording stuff
+        private SkeletonRecorder recorder = new SkeletonRecorder();
+
+        private bool isRecording = false;
+
+        private Button startButton;
+        private Button stopButton;
+        private Button saveButton;
 
         /// <summary>
         /// Initializes a new instance of the MainWindow class.
@@ -181,6 +191,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             {
                 this.statusBarText.Text = Properties.Resources.NoKinectReady;
             }
+
+            startButton = (Button)FindName("StartRecording");
+            stopButton = (Button)FindName("StopRecording");
+            saveButton = (Button)FindName("SaveRecording");
         }
 
         /// <summary>
@@ -228,6 +242,12 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                         if (skel.TrackingState == SkeletonTrackingState.Tracked)
                         {
                             this.DrawBonesAndJoints(skel, dc);
+
+                            // capture the current skeleton
+                            if (isRecording)
+                            {
+                                recorder.Capture(skel);
+                            }
                         }
                         else if (skel.TrackingState == SkeletonTrackingState.PositionOnly)
                         {
@@ -374,17 +394,26 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
         private void StartRecordingClicked(object sender, RoutedEventArgs e)
         {
+            // clear old recordings
+            recorder.Clear();
+            isRecording = true;
 
+            StartRecording.IsEnabled = false;
+            StopRecording.IsEnabled = true;
         }
 
         private void StopRecordingClicked(object sender, RoutedEventArgs e)
         {
+            isRecording = false;
 
+            StartRecording.IsEnabled = true;
+            StopRecording.IsEnabled = false;
+            SaveRecording.IsEnabled = true;
         }
 
         private void SaveRecordingClicked(object sender, RoutedEventArgs e)
         {
-
+            recorder.Export("export.txt");
         }
     }
 }
