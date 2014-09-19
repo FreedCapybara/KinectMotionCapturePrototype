@@ -10,6 +10,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
     class SkeletonRecorder
     {
         private List<Skeleton> frames = new List<Skeleton>();
+        private IEnumerator<Skeleton> frameEnumerator;
 
         public void Clear()
         {
@@ -19,6 +20,22 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         public void Capture(Skeleton skeleton)
         {
             frames.Add(skeleton);
+        }
+
+        public Skeleton GetFrame()
+        {
+            if (frameEnumerator == null)
+            {
+                frameEnumerator = frames.GetEnumerator();
+            }
+
+            if (!frameEnumerator.MoveNext())
+            {
+                frameEnumerator.Reset();
+                frameEnumerator.MoveNext();
+            }
+
+            return frameEnumerator.Current;
         }
 
         public void Export(string filename)

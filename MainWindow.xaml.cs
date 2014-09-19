@@ -84,12 +84,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
         // recording stuff
         private SkeletonRecorder recorder = new SkeletonRecorder();
-
         private bool isRecording = false;
-
-        private Button startButton;
-        private Button stopButton;
-        private Button saveButton;
+        private bool recordingIsPlaying = false;
 
         /// <summary>
         /// Initializes a new instance of the MainWindow class.
@@ -191,10 +187,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             {
                 this.statusBarText.Text = Properties.Resources.NoKinectReady;
             }
-
-            startButton = (Button)FindName("StartRecording");
-            stopButton = (Button)FindName("StopRecording");
-            saveButton = (Button)FindName("SaveRecording");
         }
 
         /// <summary>
@@ -217,6 +209,22 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <param name="e">event arguments</param>
         private void SensorSkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
         {
+            if (recordingIsPlaying)
+            {
+                Skeleton skeleton = recorder.GetFrame();
+
+                using (DrawingContext dc = this.drawingGroup.Open())
+                {
+                    dc.DrawRectangle(Brushes.Black, null, new Rect(0.0, 0.0, RenderWidth, RenderHeight));
+
+                    if (skeleton != null)
+                    {
+                        RenderSkeleton(dc, skeleton);
+                    }
+                }
+                return;
+            }
+
             Skeleton[] skeletons = new Skeleton[0];
 
             using (SkeletonFrame skeletonFrame = e.OpenSkeletonFrame())
@@ -237,32 +245,37 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 {
                     foreach (Skeleton skel in skeletons)
                     {
-                        RenderClippedEdges(skel, dc);
-
-                        if (skel.TrackingState == SkeletonTrackingState.Tracked)
-                        {
-                            this.DrawBonesAndJoints(skel, dc);
-
-                            // capture the current skeleton
-                            if (isRecording)
-                            {
-                                recorder.Capture(skel);
-                            }
-                        }
-                        else if (skel.TrackingState == SkeletonTrackingState.PositionOnly)
-                        {
-                            dc.DrawEllipse(
-                            this.centerPointBrush,
-                            null,
-                            this.SkeletonPointToScreen(skel.Position),
-                            BodyCenterThickness,
-                            BodyCenterThickness);
-                        }
+                        RenderSkeleton(dc, skel);
                     }
                 }
 
                 // prevent drawing outside of our render area
                 this.drawingGroup.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, RenderWidth, RenderHeight));
+            }
+        }
+
+        private void RenderSkeleton(DrawingContext dc, Skeleton skel)
+        {
+            RenderClippedEdges(skel, dc);
+
+            if (skel.TrackingState == SkeletonTrackingState.Tracked)
+            {
+                this.DrawBonesAndJoints(skel, dc);
+
+                // capture the current skeleton
+                if (isRecording)
+                {
+                    recorder.Capture(skel);
+                }
+            }
+            else if (skel.TrackingState == SkeletonTrackingState.PositionOnly)
+            {
+                dc.DrawEllipse(
+                this.centerPointBrush,
+                null,
+                this.SkeletonPointToScreen(skel.Position),
+                BodyCenterThickness,
+                BodyCenterThickness);
             }
         }
 
@@ -301,7 +314,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             this.DrawBone(skeleton, drawingContext, JointType.HipRight, JointType.KneeRight);
             this.DrawBone(skeleton, drawingContext, JointType.KneeRight, JointType.AnkleRight);
             this.DrawBone(skeleton, drawingContext, JointType.AnkleRight, JointType.FootRight);
- 
+
             // Render Joints
             foreach (Joint joint in skeleton.Joints)
             {
@@ -309,11 +322,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
                 if (joint.TrackingState == JointTrackingState.Tracked)
                 {
-                    drawBrush = this.trackedJointBrush;                    
+                    drawBrush = this.trackedJointBrush;
                 }
                 else if (joint.TrackingState == JointTrackingState.Inferred)
                 {
-                    drawBrush = this.inferredJointBrush;                    
+                    drawBrush = this.inferredJointBrush;
                 }
 
                 if (drawBrush != null)
@@ -397,6 +410,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             // clear old recordings
             recorder.Clear();
             isRecording = true;
+            recordingIsPlaying = false;
 
             StartRecording.IsEnabled = false;
             StopRecording.IsEnabled = true;
@@ -404,16 +418,35 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
         private void StopRecordingClicked(object sender, RoutedEventArgs e)
         {
-            isRecording = false;
+            if (isRecording)
+            {
+                isRecording = false;
+            }
+
+            if (recordingIsPlaying)
+            {
+                recordingIsPlaying = false;
+            }
 
             StartRecording.IsEnabled = true;
             StopRecording.IsEnabled = false;
+            PlayRecording.IsEnabled = true;
             SaveRecording.IsEnabled = true;
         }
 
         private void SaveRecordingClicked(object sender, RoutedEventArgs e)
         {
             recorder.Export("export.txt");
+        }
+
+        private void PlayRecordingClicked(object sender, RoutedEventArgs e)
+        {
+            recordingIsPlaying = true;
+
+            StartRecording.IsEnabled = false;
+            StopRecording.IsEnabled = true;
+            PlayRecording.IsEnabled = false;
+            SaveRecording.IsEnabled = false;
         }
     }
 }
