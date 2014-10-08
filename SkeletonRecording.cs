@@ -42,16 +42,15 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         {
             StringBuilder sb = new StringBuilder();
 
-            // create a line for each frame in this format:
-            // trackingId;jointType,jointX,jointY,jointZ;...;
             foreach (var skeleton in frames)
             {
-                sb.Append(string.Format("{0};", skeleton.TrackingId));
-                foreach (Joint joint in skeleton.Joints)
-                {
-                    sb.Append(String.Format("{0},{1},{2},{3};", joint.JointType, joint.Position.X, joint.Position.Y, joint.Position.Z));
-                }
-                sb.Append("\n");
+				var rightElbowPosition = skeleton.Joints.First(joint => joint.JointType == JointType.ElbowRight).Position;
+				var rightHandPosition = skeleton.Joints.First(joint => joint.JointType == JointType.HandRight).Position;
+				sb.Append(string.Format("box.setPositionRelativeToVehicle(new Position({0}, {1}, {2}), Move.duration(0));\n", rightElbowPosition.X * 10, rightElbowPosition.Y * 10, rightElbowPosition.Z * 0));
+				sb.Append("biped.getRightShoulder().pointAt(box, PointAt.duration(0));\n");
+				sb.Append(string.Format("box.setPositionRelativeToVehicle(new Position({0}, {1}, {2}), Move.duration(0));\n", rightHandPosition.X * 10, rightHandPosition.Y * 10, rightHandPosition.Z * 0));
+				sb.Append("biped.getRightElbow().pointAt(box, PointAt.duration(0));\n");
+				sb.Append("box.delay(0.0166);\n");
             }
 
             using (StreamWriter outfile = new StreamWriter(filename, false))
