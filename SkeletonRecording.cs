@@ -49,69 +49,21 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             {
 				var refPosition = skeleton.Joints.First(joint => joint.JointType == referenceJointType).Position;
 				// right shoulder -> right elbow
-				var rightElbowPosition = skeleton.Joints.First(joint => joint.JointType == JointType.ElbowRight).Position;
-				sb.Append(string.Format("box.setPositionRelativeToVehicle(new Position({0}, {1}, {2}), Move.duration(0));\n",
-					(rightElbowPosition.X - refPosition.X) * scaleFactor,
-					(rightElbowPosition.Y - refPosition.Y) * scaleFactor,
-					(rightElbowPosition.Z - refPosition.Z) * scaleFactor
-				));
-				sb.Append("biped.getRightShoulder().pointAt(box, PointAt.duration(0));\n");
+				sb.Append(GetCode(skeleton, "RightShoulder", JointType.ElbowRight, refPosition));
 				// right elbow -> hand
-				var rightHandPosition = skeleton.Joints.First(joint => joint.JointType == JointType.HandRight).Position;
-				sb.Append(string.Format("box.setPositionRelativeToVehicle(new Position({0}, {1}, {2}), Move.duration(0));\n",
-					(rightHandPosition.X - refPosition.X) * scaleFactor,
-					(rightHandPosition.Y - refPosition.Y) * scaleFactor,
-					(rightHandPosition.Z - refPosition.Z) * scaleFactor
-				));
-				sb.Append("biped.getRightElbow().pointAt(box, PointAt.duration(0));\n");
+				sb.Append(GetCode(skeleton, "RightElbow", JointType.HandRight, refPosition));
 				// left shoulder -> left elbow
-				var leftElbowPosition = skeleton.Joints.First(joint => joint.JointType == JointType.ElbowLeft).Position;
-				sb.Append(string.Format("box.setPositionRelativeToVehicle(new Position({0}, {1}, {2}), Move.duration(0));\n",
-						(leftElbowPosition.X - refPosition.X) * scaleFactor,
-						(leftElbowPosition.Y - refPosition.Y) * scaleFactor,
-						(leftElbowPosition.Z - refPosition.Z) * scaleFactor
-					));
-				sb.Append("biped.getLeftShoulder().pointAt(box, PointAt.duration(0));\n");	
+				sb.Append(GetCode(skeleton, "LeftShoulder", JointType.ElbowLeft, refPosition));
 				// left elbow -> hand
-				var leftHandPosition = skeleton.Joints.First(joint => joint.JointType == JointType.HandLeft).Position;
-				sb.Append(string.Format("box.setPositionRelativeToVehicle(new Position({0}, {1}, {2}), Move.duration(0));\n",
-					(leftHandPosition.X - refPosition.X) * scaleFactor,
-					(leftHandPosition.Y - refPosition.Y) * scaleFactor,
-					(leftHandPosition.Z - refPosition.Z) * scaleFactor
-				));
-				sb.Append("biped.getLeftElbow().pointAt(box, PointAt.duration(0));\n");
+				sb.Append(GetCode(skeleton, "LeftElbow", JointType.HandLeft, refPosition));
 				// right hip -> right knee
-				var rightKneePosition = skeleton.Joints.First(joint => joint.JointType == JointType.KneeRight).Position;
-				sb.Append(string.Format("box.setPositionRelativeToVehicle(new Position({0}, {1}, {2}), Move.duration(0));\n",
-					(rightKneePosition.X - refPosition.X) * scaleFactor,
-					(rightKneePosition.Y - refPosition.Y) * scaleFactor,
-					(rightKneePosition.Z - refPosition.Z) * scaleFactor
-				));
-				sb.Append("biped.getRightKnee().pointAt(box, PointAt.duration(0));\n");
+				sb.Append(GetCode(skeleton, "RightHip", JointType.KneeRight, refPosition));
 				// right knee -> right foot
-				var rightFootPosition = skeleton.Joints.First(joint => joint.JointType == JointType.FootRight).Position;
-				sb.Append(string.Format("box.setPositionRelativeToVehicle(new Position({0}, {1}, {2}), Move.duration(0));\n",
-					(rightFootPosition.X - refPosition.X) * scaleFactor,
-					(rightFootPosition.Y - refPosition.Y) * scaleFactor,
-					(rightFootPosition.Z - refPosition.Z) * scaleFactor
-				));
-				sb.Append("biped.getRightAnkle().pointAt(box, PointAt.duration(0));\n");
+				sb.Append(GetCode(skeleton, "RightKnee", JointType.FootRight, refPosition));
 				// left hip -> left knee
-				var rightKneePosition = skeleton.Joints.First(joint => joint.JointType == JointType.KneeRight).Position;
-				sb.Append(string.Format("box.setPositionRelativeToVehicle(new Position({0}, {1}, {2}), Move.duration(0));\n",
-					(rightKneePosition.X - refPosition.X) * scaleFactor,
-					(rightKneePosition.Y - refPosition.Y) * scaleFactor,
-					(rightKneePosition.Z - refPosition.Z) * scaleFactor
-				));
-				sb.Append("biped.getRightKnee().pointAt(box, PointAt.duration(0));\n");
+				sb.Append(GetCode(skeleton, "LeftHip", JointType.KneeLeft, refPosition));
 				// left knee -> left foot
-				var rightFootPosition = skeleton.Joints.First(joint => joint.JointType == JointType.FootRight).Position;
-				sb.Append(string.Format("box.setPositionRelativeToVehicle(new Position({0}, {1}, {2}), Move.duration(0));\n",
-					(rightFootPosition.X - refPosition.X) * scaleFactor,
-					(rightFootPosition.Y - refPosition.Y) * scaleFactor,
-					(rightFootPosition.Z - refPosition.Z) * scaleFactor
-				));
-				sb.Append("biped.getRightAnkle().pointAt(box, PointAt.duration(0));\n");
+				sb.Append(GetCode(skeleton, "LeftKnee", JointType.FootLeft, refPosition));
 				// delay
 				sb.Append("box.delay(0.0166);\n");
             }
@@ -121,5 +73,16 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 outfile.Write(sb.ToString());
             }
         }
+
+		private string GetCode(Skeleton skeleton, string aliceJointFrom, JointType kinectJointTo, SkeletonPoint refPosition, double scale = 5)
+		{
+			var position = skeleton.Joints.First(joint => joint.JointType == kinectJointTo).Position;
+			return string.Format("box.setPositionRelativeToVehicle(new Position({0}, {1}, {2}), Move.duration(0));\nbiped.get{3}().pointAt(box, PointAt.duration(0));\n",
+				(position.X - refPosition.X) * scale,
+				(position.Y - refPosition.Y) * scale,
+				(position.Z - refPosition.Z) * scale,
+				aliceJointFrom
+			);
+		}
     }
 }
