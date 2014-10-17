@@ -55,6 +55,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 			{
 				finalPositions.Add(i, new SkeletonPoint());
 			}
+			finalPositions[JointType.HipCenter] = new SkeletonPoint() { Y = 1.0f };
 		}
 
 		public void Clear()
@@ -118,7 +119,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 				adjustedDifference = toJoint
 										.Subtract(fromJoint)
 										.Normalize()
-										.Multiply(boneData[i].JointLength * 5);
+										.Multiply(boneData[i].JointLength);
 				// the adjusted difference needs to be added to the final position of the 'from' joint,
 				// which is stored in a dictionary and has been computed already if the values in boneData are ordered correctly
 				// ~ it's kind of a dynamic programming approach in that it avoids repeated calculation of the previous joints
