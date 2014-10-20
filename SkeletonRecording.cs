@@ -29,6 +29,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 		private Dictionary<JointType, SkeletonPoint> finalPositions = new Dictionary<JointType, SkeletonPoint>();
 		private IEnumerator<Skeleton> frameEnumerator;
 
+		static string ignore = "Neck Pelvis LeftAnkle RightAnkle";
+
 		private JointData[] boneData = new JointData[16] {
 			new JointData("Pelvis", JointType.HipCenter, JointType.ShoulderCenter, 0.4375f),
 			new JointData("Neck", JointType.ShoulderCenter, JointType.Head, 0.0625f),
@@ -86,12 +88,19 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
 		public void Export(string filename)
 		{
+			if (frames.Count == 0)
+			{
+				return;
+			}
+
 			StringBuilder sb = new StringBuilder();
 
+			SkeletonPoint prevRootPosition = frames.First().Joints.First(joint => joint.JointType == JointType.HipCenter).Position;
 			foreach (var skeleton in frames)
 			{
-				sb.Append(GetCode(skeleton));
+				sb.Append(GetCode(skeleton, prevRootPosition));
 				sb.Append("box.delay(0.0166);\n"); // delay 1/60s each frame
+				prevRootPosition = skeleton.Joints.First(joint => joint.JointType == JointType.HipCenter).Position;
 			}
 
 			using (StreamWriter outfile = new StreamWriter(filename, false))
@@ -100,13 +109,19 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 			}
 		}
 
-		private string GetCode(Skeleton skeleton)
+		private string GetCode(Skeleton skeleton, SkeletonPoint prevRootPosition)
 		{
 			// compute the final positions for each joint and add the Alice code to the stringbuilder
 			SkeletonPoint fromJoint;
 			SkeletonPoint toJoint;
 			SkeletonPoint adjustedDifference;
 			StringBuilder result = new StringBuilder();
+
+			var pelvis = skeleton.Joints.First(joint => joint.JointType == JointType.HipCenter).Position;
+			adjustedDifference = pelvis.Subtract(prevRootPosition).Normalize().Multiply(0.05f);
+			result.Append(string.Format("biped.move(MoveDirection.LEFT, {0}, Move.duration(0));biped.move(MoveDirection.UP, {1}, Move.duration(0));biped.move(MoveDirection.BACKWARD, {2}, Move.duration(0));\n",
+				adjustedDifference.X, adjustedDifference.Y, adjustedDifference.Z));
+
 			for (int i = 0; i < boneData.Length; i++)
 			{
 				fromJoint = skeleton.Joints.First(joint => joint.JointType == boneData[i].KinectJointFrom).Position;
@@ -138,7 +153,5 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 			}
 			return result.ToString();
 		}
-
-		static string ignore = "Neck Pelvis LeftAnkle RightAnkle";
 	}
 }
