@@ -119,7 +119,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
 			var pelvis = skeleton.Joints.First(joint => joint.JointType == JointType.HipCenter).Position;
 			adjustedDifference = pelvis.Subtract(prevRootPosition).Normalize().Multiply(0.05f);
-			result.Append(string.Format("biped.move(MoveDirection.LEFT, {0}, Move.duration(0));biped.move(MoveDirection.UP, {1}, Move.duration(0));biped.move(MoveDirection.BACKWARD, {2}, Move.duration(0));\n",
+			result.Append(string.Format("biped.move(MoveDirection.UP, {1}, Move.duration(0));\n",
 				adjustedDifference.X, adjustedDifference.Y, adjustedDifference.Z));
 
 			for (int i = 0; i < boneData.Length; i++)
