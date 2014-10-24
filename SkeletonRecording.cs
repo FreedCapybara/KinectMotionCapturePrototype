@@ -95,12 +95,13 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
 			StringBuilder sb = new StringBuilder();
 
-			SkeletonPoint prevRootPosition = frames.First().Joints.First(joint => joint.JointType == JointType.HipCenter).Position;
+			var rootPosition = frames.First().Joints.First(joint => joint.JointType == JointType.HipCenter).Position;
+
 			foreach (var skeleton in frames)
 			{
-				sb.Append(GetCode(skeleton, prevRootPosition));
+				sb.Append(GetMovementCode(skeleton, rootPosition));
+				sb.Append(GetJointsCode(skeleton));
 				sb.Append("box.delay(0.0166);\n"); // delay 1/60s each frame
-				prevRootPosition = skeleton.Joints.First(joint => joint.JointType == JointType.HipCenter).Position;
 			}
 
 			using (StreamWriter outfile = new StreamWriter(filename, false))
@@ -109,18 +110,30 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 			}
 		}
 
-		private string GetCode(Skeleton skeleton, SkeletonPoint prevRootPosition)
+		private string GetMovementCode(Skeleton skeleton, SkeletonPoint rootPosition)
+		{
+			StringBuilder result = new StringBuilder();
+
+			var pelvis = skeleton.Joints.First(joint => joint.JointType == JointType.HipCenter).Position;
+			var moveDifference = pelvis.Subtract(rootPosition).Normalize().Multiply(0.25f);
+
+			// this moving algorithm attempts to use absolute positioning rather than relative positioning (adjusting based on the previous position)
+			// in order to stop Alice characters from drifting away after the animation has run a few iterations
+			// 1. move a box that does not have the biped as a vehicle to the desired position
+			result.Append(string.Format("root.setPositionRelativeToVehicle(new Position(0, {0}, 0), Move.duration(0));", moveDifference.Y));
+			// 2. move the person to the box
+			result.Append("biped.moveTo(root, MoveTo.duration(0));\n");
+
+			return result.ToString();
+		}
+
+		private string GetJointsCode(Skeleton skeleton)
 		{
 			// compute the final positions for each joint and add the Alice code to the stringbuilder
 			SkeletonPoint fromJoint;
 			SkeletonPoint toJoint;
 			SkeletonPoint adjustedDifference;
 			StringBuilder result = new StringBuilder();
-
-			var pelvis = skeleton.Joints.First(joint => joint.JointType == JointType.HipCenter).Position;
-			adjustedDifference = pelvis.Subtract(prevRootPosition).Normalize().Multiply(0.05f);
-			result.Append(string.Format("biped.move(MoveDirection.UP, {1}, Move.duration(0));\n",
-				adjustedDifference.X, adjustedDifference.Y, adjustedDifference.Z));
 
 			for (int i = 0; i < boneData.Length; i++)
 			{
