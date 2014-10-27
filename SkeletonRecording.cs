@@ -12,11 +12,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 		private List<Skeleton> frames = new List<Skeleton>();
 		private IEnumerator<Skeleton> frameEnumerator;
 
-		private AliceCodeGenerator aliceGenerator;
+		private AliceFileBuilder fileBuilder;
 
 		public SkeletonRecorder()
 		{
-			aliceGenerator = new AliceCodeGenerator();
+			fileBuilder = new AliceFileBuilder();
 		}
 
 		public void Clear()
@@ -52,18 +52,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 				return;
 			}
 
-			StringBuilder sb = new StringBuilder();
+			fileBuilder.Prepare();
 
 			foreach (var skeleton in frames)
 			{
-				sb.Append(aliceGenerator.GetMovementCode(skeleton));
-				sb.Append(aliceGenerator.GetJointsCode(skeleton));
-				sb.Append("box.delay(0.0166);\n"); // delay 1/60s each frame
-			}
-
-			using (StreamWriter outfile = new StreamWriter(filename, false))
-			{
-				outfile.Write(sb.ToString());
+				fileBuilder.ApplyFrame(skeleton);
 			}
 		}
 	}

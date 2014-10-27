@@ -6,6 +6,10 @@ using System.Text;
 
 namespace Microsoft.Samples.Kinect.SkeletonBasics
 {
+	/// <summary>
+	/// Generates code for Alice animation methods from Kinect skeletons,
+	/// adjusting for Alice bone lengths to produce accurate animations.
+	/// </summary>
 	class AliceCodeGenerator
 	{
 		private class JointData
