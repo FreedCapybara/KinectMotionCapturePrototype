@@ -54,11 +54,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
 			StringBuilder sb = new StringBuilder();
 
-			var rootPosition = frames.First().Joints.First(joint => joint.JointType == JointType.HipCenter).Position;
-
 			foreach (var skeleton in frames)
 			{
-				sb.Append(aliceGenerator.GetMovementCode(skeleton, rootPosition));
+				sb.Append(aliceGenerator.GetMovementCode(skeleton));
 				sb.Append(aliceGenerator.GetJointsCode(skeleton));
 				sb.Append("box.delay(0.0166);\n"); // delay 1/60s each frame
 			}

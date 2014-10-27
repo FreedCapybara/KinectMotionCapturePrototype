@@ -46,6 +46,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 		};
 
 		private static Dictionary<JointType, SkeletonPoint> finalPositions = new Dictionary<JointType, SkeletonPoint>();
+		private SkeletonPoint originalRootPosition;
+		private bool originalRootPositionSet;
 
 		public AliceCodeGenerator()
 		{
@@ -57,12 +59,25 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 			finalPositions[JointType.HipCenter] = new SkeletonPoint() { Y = 1.0f };
 		}
 
-		public string GetMovementCode(Skeleton skeleton, SkeletonPoint rootPosition)
+		public void Init()
+		{
+			originalRootPositionSet = false;
+		}
+
+		public string GetMovementCode(Skeleton skeleton)
 		{
 			StringBuilder result = new StringBuilder();
 
+			// get the pelvis
 			var pelvis = skeleton.Joints.First(joint => joint.JointType == JointType.HipCenter).Position;
-			var moveDifference = pelvis.Subtract(rootPosition).Normalize().Multiply(0.25f);
+			// set the pelvis as the original root if it hasn't been set yet (should happen on the first frame after init() only)
+			if (!originalRootPositionSet)
+			{
+				originalRootPosition = pelvis;
+				originalRootPositionSet = true;
+			}
+			// get the position difference between the original root position and the current position of the root
+			var moveDifference = pelvis.Subtract(originalRootPosition).Normalize().Multiply(0.25f);
 
 			// this moving algorithm attempts to use absolute positioning rather than relative positioning (adjusting based on the previous position)
 			// in order to stop Alice characters from drifting away after the animation has run a few iterations
