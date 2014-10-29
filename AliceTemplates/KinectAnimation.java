@@ -17,7 +17,7 @@ public class KinectAnimation implements IAnimator {{
 	public KinectAnimation(SScene scene) throws Exception {{
 		for (int i = 0; i < totalSegments; i++) {{
 			Class segmentClass = Class.forName("edu.calvin.cs.alicekinect.AnimationSegment" + i);
-			IAnimator segment = (IAnimator)segmentClass.newInstance();
+			IAnimator segment = (IAnimator)segmentClass.getDeclaredConstructor(SScene.class).newInstance(scene);
 			animationSegments.add(segment);
 		}}
 	}}
