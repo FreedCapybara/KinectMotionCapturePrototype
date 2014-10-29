@@ -58,6 +58,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 			{
 				fileBuilder.ApplyFrame(skeleton);
 			}
+
+			fileBuilder.Finish();
 		}
 	}
 }

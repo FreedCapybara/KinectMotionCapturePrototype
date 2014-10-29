@@ -16,22 +16,22 @@ import org.lgna.story.Position;
  * A section of an animation created with the Kinect.
  * @author andrew
  */
-public class AnimationSegment{0} implements IAnimator {
+public class AnimationSegment{0} implements IAnimator {{
 
 	SBox box = new SBox();
 	SBox root = new SBox();
 
-	public AnimationSegment{0}(SScene scene) {
+	public AnimationSegment{0}(SScene scene) {{
 		box.setName("wand");
 		box.setOpacity(0, SetOpacity.duration(0));
 		root.setName("root");
 		root.setOpacity(0, SetOpacity.duration(0));
 		root.setVehicle(scene);
-	}
+	}}
 
-	public void animate(SBiped biped) {
+	public void animate(SBiped biped) {{
 		box.setVehicle(biped);
 
 		{1}
-	}
-}
+	}}
+}}
