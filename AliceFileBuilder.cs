@@ -1,6 +1,7 @@
 ﻿using Microsoft.Kinect;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -9,6 +10,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 {
 	class AliceFileBuilder
 	{
+		private readonly string package = "edu/calvin/cs/alicekinect";
+
 		public int FramesPerSegment { get; set; }
 		public int MaxSegments { get; set; }
 		public string AnimationClassName { get; set; }
@@ -23,7 +26,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 		private string segmentTemplate; // {0} segment number, {1} data
 		private string animationTemplate; // {0} number of segments
 
-		public AliceFileBuilder(int framesPerSegment = 80, int maxSegments = 50, string animationClassName = "KinectAnimation", string outputDirectory = "generated")
+		public AliceFileBuilder(int framesPerSegment = 80, int maxSegments = 50, string animationClassName = "KinectAnimation", string outputDirectory = ".")
 		{
 			aliceGenerator = new AliceCodeGenerator();
 			// note: it's approx. 10 lines of code per frame
@@ -57,7 +60,18 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 				}
 			}
 
+			try
+			{
+				Directory.Delete("src", true);
+				Directory.Delete("build", true);
+			}
+			catch (Exception)
+			{
+			}
+
 			Directory.CreateDirectory(OutputDirectory);
+			Directory.CreateDirectory(string.Format("src/{0}", package));
+			Directory.CreateDirectory("build");
 		}
 
 		public void ApplyFrame(Skeleton skeleton)
@@ -86,15 +100,16 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 			// write any remaining contents of the stringbuilder
 			WriteSB();
 			// write the total number of segments (currentSegment + 1) to the KinectAnimation template
-			var outputFileName = string.Format("{0}/{1}.java", OutputDirectory, AnimationClassName);
+			var outputFileName = string.Format("src/{0}/{1}.java", package, AnimationClassName);
 			using (StreamWriter outfile = new StreamWriter(outputFileName, false))
 			{
 				outfile.Write(string.Format(animationTemplate, currentSegment + 1));
 			}
 			// copy the interface to the output directory
-			var outputFile = string.Format("{0}/IAnimator.java", OutputDirectory);
+			var outputFile = string.Format("src/{0}/IAnimator.java", package);
 			File.Copy("AliceTemplates/IAnimator.java", outputFile, true);
-			// run java to create a jar file
+			// compile the sources and create a jar file
+			RunBuildScript();
 		}
 
 		/// <summary>
@@ -102,12 +117,24 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 		/// </summary>
 		private void WriteSB()
 		{
-			var fileName = string.Format("{0}/AnimationSegment{1}.java", OutputDirectory, currentSegment);
+			var fileName = string.Format("src/{0}/AnimationSegment{1}.java", package, currentSegment);
 			using (StreamWriter outfile = new StreamWriter(fileName, false))
 			{
 				outfile.Write(string.Format(segmentTemplate, currentSegment, sb.ToString()));
 			}
 			sb.Clear();
+		}
+
+		//http://stackoverflow.com/questions/1469764/run-command-prompt-commands
+		private void RunBuildScript()
+		{
+			Process process = new Process();
+			ProcessStartInfo startInfo = new ProcessStartInfo();
+			startInfo.WindowStyle = ProcessWindowStyle.Hidden;
+			startInfo.FileName = "powershell.exe";
+			startInfo.Arguments = string.Format("./AliceBuild/build.ps1 {0}", AnimationClassName);
+			process.StartInfo = startInfo;
+			process.Start();
 		}
 	}
 }
