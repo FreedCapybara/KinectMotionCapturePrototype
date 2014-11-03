@@ -14,11 +14,14 @@ public class KinectAnimation implements IAnimator {{
 	List<IAnimator> animationSegments = new ArrayList<IAnimator>();
 	int totalSegments = {0};
 	
-	public KinectAnimation(SScene scene) throws Exception {{
-		for (int i = 0; i < totalSegments; i++) {{
-			Class segmentClass = Class.forName("edu.calvin.cs.alicekinect.AnimationSegment" + i);
-			IAnimator segment = (IAnimator)segmentClass.getDeclaredConstructor(SScene.class).newInstance(scene);
-			animationSegments.add(segment);
+	public KinectAnimation(SScene scene) {{
+		try {{
+			for (int i = 0; i < totalSegments; i++) {{
+				Class segmentClass = Class.forName("edu.calvin.cs.alicekinect.AnimationSegment" + i);
+				IAnimator segment = (IAnimator)segmentClass.getDeclaredConstructor(SScene.class).newInstance(scene);
+				animationSegments.add(segment);
+			}}
+		}} catch (Exception e) {{
 		}}
 	}}
 
