@@ -61,10 +61,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="AliceCodeGenerator.cs" />
-    <Compile Include="AliceFileBuilder.cs" />
-    <Compile Include="SkeletonPointExtensions.cs" />
-    <Compile Include="SkeletonRecording.cs" />
+    <Compile Include="Generation\AliceCodeGenerator.cs" />
+    <Compile Include="Generation\AliceFileBuilder.cs" />
+    <Compile Include="Generation\SkeletonPointExtensions.cs" />
+    <Compile Include="Recording\SkeletonRecording.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

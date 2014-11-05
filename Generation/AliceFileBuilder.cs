@@ -26,7 +26,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 		private string segmentTemplate; // {0} segment number, {1} data
 		private string animationTemplate; // {0} number of segments
 
-		public AliceFileBuilder(int framesPerSegment = 80, int maxSegments = 50, string animationClassName = "KinectAnimation", string outputDirectory = ".")
+		public AliceFileBuilder(int framesPerSegment = 25, int maxSegments = 50, string animationClassName = "KinectAnimation", string outputDirectory = ".")
 		{
 			aliceGenerator = new AliceCodeGenerator();
 			// note: it's approx. 10 lines of code per frame

@@ -1,4 +1,4 @@
-package edu.calvin.cs.alicekinect;
+﻿package edu.calvin.cs.alicekinect;
 
 import org.lgna.story.SBiped;
 import org.lgna.story.SBox;
@@ -11,6 +11,8 @@ import org.lgna.story.MoveDirection;
 import org.lgna.story.MoveTo;
 import org.lgna.story.PointAt;
 import org.lgna.story.Position;
+import org.lgna.story.Roll;
+import org.lgna.story.RollDirection;
 
 /**
  * A section of an animation created with the Kinect.

@@ -31,8 +31,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 		private string ignore = "Neck Pelvis LeftAnkle RightAnkle";
 
 		private JointData[] boneData = new JointData[16] {
-			new JointData("Pelvis", JointType.HipCenter, JointType.ShoulderCenter, 0.4375f),
-			new JointData("Neck", JointType.ShoulderCenter, JointType.Head, 0.0625f),
+			new JointData("SpineBase", JointType.HipCenter, JointType.ShoulderCenter, 0.4375f),
+			new JointData("Neck", JointType.ShoulderCenter, JointType.Head, 0.0625f), 
 			new JointData("Neck", JointType.ShoulderCenter, JointType.ShoulderLeft, 0.125f),
 			new JointData("Neck", JointType.ShoulderCenter, JointType.ShoulderRight, 0.125f),
 			new JointData("LeftShoulder", JointType.ShoulderLeft, JointType.ElbowLeft, 0.25f),
@@ -128,6 +128,12 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 						finalPosition.X, finalPosition.Y, finalPosition.Z,
 						boneData[i].AliceJointFrom
 					));
+					// if the final joint position was behind its parent joint, the parent needs to be rolled 180 degrees (0.5 rotations)
+					// otherwise the joint gets turned around and everything looks weird (twisted spines and knees and such)
+					if (adjustedDifference.Z > 0)
+					{
+						result.Append(string.Format("biped.get{0}().roll(RollDirection.LEFT, 0.5, Roll.duration(0));\n", boneData[i].AliceJointFrom));
+					}
 				}
 			}
 			return result.ToString();
