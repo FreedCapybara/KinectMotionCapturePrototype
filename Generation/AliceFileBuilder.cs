@@ -8,6 +8,9 @@ using System.Text;
 
 namespace Microsoft.Samples.Kinect.SkeletonBasics
 {
+	/// <summary>
+	/// Exports, compiles, and creates a jar from Java classes containing animation code for use in Alice.
+	/// </summary>
 	class AliceFileBuilder
 	{
 		private readonly string package = "edu/calvin/cs/alicekinect";
@@ -60,6 +63,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 				}
 			}
 
+			// set up the output directories
 			try
 			{
 				Directory.Delete("src", true);
@@ -68,12 +72,18 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 			catch (Exception)
 			{
 			}
-
 			Directory.CreateDirectory(OutputDirectory);
 			Directory.CreateDirectory(string.Format("src/{0}", package));
 			Directory.CreateDirectory("build");
 		}
 
+		/// <summary>
+		/// Adds one animation frame to the exportable code.
+		/// When the number of frames processed surpasses the number of frames in a segment,
+		/// all the code generated is written to a Java class (AnimationSegmentX.java where X is the segment number)
+		/// and the next segment is started.  The goal is to make a large group of classes to avoid Java 'code too large' compiler errors.
+		/// </summary>
+		/// <param name="skeleton">A skeleton representing a frame of the animation</param>
 		public void ApplyFrame(Skeleton skeleton)
 		{
 			if (currentSegment > MaxSegments)
@@ -95,6 +105,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 			}
 		}
 
+		/// <summary>
+		/// Finalizes the animation, then compiles and jars it.
+		/// </summary>
 		public void Finish()
 		{
 			// write any remaining contents of the stringbuilder
@@ -125,6 +138,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 			sb.Clear();
 		}
 
+		/// <summary>
+		/// Runs a Powershell script to compile and jar the generated source code.
+		/// </summary>
 		//http://stackoverflow.com/questions/1469764/run-command-prompt-commands
 		private void RunBuildScript()
 		{

@@ -12,6 +12,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 	/// </summary>
 	class AliceCodeGenerator
 	{
+		/// <summary>
+		/// Helper class for holding data to calculate skeleton rotations.
+		/// </summary>
+		// See boneData[] below.
 		private class JointData
 		{
 			public string AliceJointFrom { get; set; }
@@ -28,8 +32,16 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 			}
 		}
 
+		/// <summary>
+		/// String of Alice joint names to ignore when calculating bone rotations.
+		/// These are mostly joints that cause the Biped to become too distorted in a recording.
+		/// </summary>
 		private string ignore = "Neck Pelvis LeftAnkle RightAnkle";
 
+		/// <summary>
+		/// The data in this array specifies (1) the order in which the joints are processed
+		/// and (2) the length of each bone for improved animation accuracy when translating the movements to Alice.
+		/// </summary>
 		private JointData[] boneData = new JointData[16] {
 			new JointData("SpineBase", JointType.HipCenter, JointType.ShoulderCenter, 0.4375f),
 			new JointData("Neck", JointType.ShoulderCenter, JointType.Head, 0.0625f), 
@@ -49,8 +61,18 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 			new JointData("RightAnkle", JointType.AnkleRight, JointType.FootRight, 0.125f),
 		};
 
+		/// <summary>
+		/// Stores the final positions of joints so the absolute positions of joints can be computed without recomputing parent joints.
+		/// </summary>
 		private static Dictionary<JointType, SkeletonPoint> finalPositions = new Dictionary<JointType, SkeletonPoint>();
+		/// <summary>
+		/// The original position of a joint in the Kinect skeleton that will play the role of root joint,
+		/// from which translations of the entire Alice Biped are calculated in #GetMovementCode().
+		/// </summary>
 		private SkeletonPoint originalRootPosition;
+		/// <summary>
+		/// Flag indicating whether the original root position has been set already (SkeletonPoint is a struct, so this can't be accomplished with a null check).
+		/// </summary>
 		private bool originalRootPositionSet;
 
 		public AliceCodeGenerator()
@@ -60,6 +82,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 			{
 				finalPositions.Add(i, new SkeletonPoint());
 			}
+			// set the final position of the root joint
 			finalPositions[JointType.HipCenter] = new SkeletonPoint() { Y = 1.0f };
 		}
 
@@ -68,6 +91,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 			originalRootPositionSet = false;
 		}
 
+		/// <summary>
+		/// Generates Alice code for moving the entire Biped (allows the Biped to bounce a little during a walking animation, for example).
+		/// </summary>
+		/// <param name="skeleton">The Kinect skeleton to calculate movements from</param>
+		/// <returns>A string of Alice code that executes a Biped's movements</returns>
 		public string GetMovementCode(Skeleton skeleton)
 		{
 			StringBuilder result = new StringBuilder();
@@ -93,6 +121,12 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 			return result.ToString();
 		}
 
+		/// <summary>
+		/// Generates Alice code for rotating a Biped's joints using another object present in the scene.
+		/// The object is placed at each of the skeleton's joints, and then in Alice the parent joint is is pointed at the object to create the desired rotation.
+		/// </summary>
+		/// <param name="skeleton">The Kinect skeleton to calculate joint rotations from</param>
+		/// <returns>A string of Alice code that rotates the joints into their final positions according to the provided Kinect skeleton</returns>
 		public string GetJointsCode(Skeleton skeleton)
 		{
 			// compute the final positions for each joint and add the Alice code to the stringbuilder

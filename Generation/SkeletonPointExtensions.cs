@@ -6,6 +6,9 @@ using Microsoft.Kinect;
 
 namespace Microsoft.Samples.Kinect.SkeletonBasics
 {
+	/// <summary>
+	/// Extension methods to add some useful vector math operations to SkeletonPoint objects.
+	/// </summary>
 	static class SkeletonPointExtensions
 	{
 		public static SkeletonPoint Add(this SkeletonPoint point1, SkeletonPoint point2)
