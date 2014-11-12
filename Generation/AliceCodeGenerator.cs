@@ -37,6 +37,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 		/// These are mostly joints that cause the Biped to become too distorted in a recording.
 		/// </summary>
 		private string ignore = "Neck Pelvis LeftAnkle RightAnkle";
+		private string rotationIgnore = "LeftShoulder RightShoulder";
 
 		/// <summary>
 		/// The data in this array specifies (1) the order in which the joints are processed
@@ -172,9 +173,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 						finalPosition.X > 0 ? "LEFT" : "RIGHT",
 						rollAmount
 					));
-					// if the final joint position was behind its parent joint, the parent needs to be rolled 180 degrees (0.5 rotations)
-					// otherwise the joint gets turned around and everything looks weird (twisted spines and knees and such)
-					if (adjustedDifference.Z > 0)
+					//// if the final joint position was behind its parent joint, the parent needs to be rolled 180 degrees (0.5 rotations)
+					//// otherwise the joint gets turned around and everything looks weird (twisted spines and knees and such)
+					if (finalPosition.Z > 0 && !rotationIgnore.Contains(boneData[i].AliceJointFrom))
 					{
 						result.Append(string.Format("biped.get{0}().roll(RollDirection.LEFT, 0.5, Roll.duration(0));\n", boneData[i].AliceJointFrom));
 					}
