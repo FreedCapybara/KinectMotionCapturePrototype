@@ -154,13 +154,23 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 				var finalPosition = finalPositions[boneData[i].KinectJointFrom].Add(adjustedDifference);
 				finalPositions[boneData[i].KinectJointTo] = finalPosition;
 
+				var rotation = skeleton.BoneOrientations[boneData[i].KinectJointFrom].HierarchicalRotation.Quaternion;
+				var rollAmount = rotation.Y;
+
 				// add the Alice code to the stringbuilder
 				// (ignore rotations from the neck and pelvis for now, which screw stuff up)
 				if (!ignore.Contains(boneData[i].AliceJointFrom))
 				{
+					// position the box and point the joint at it
 					result.Append(string.Format("box.setPositionRelativeToVehicle(new Position({0}, {1}, {2}), Move.duration(0));biped.get{3}().pointAt(box, PointAt.duration(0));\n",
 						finalPosition.X, finalPosition.Y, finalPosition.Z,
 						boneData[i].AliceJointFrom
+					));
+					// roll the bone to match the Kinect data
+					result.Append(string.Format("biped.get{0}().roll(RollDirection.{1}, {2}, Roll.duration(0));\n",
+						boneData[i].AliceJointFrom,
+						finalPosition.X > 0 ? "LEFT" : "RIGHT",
+						rollAmount
 					));
 					// if the final joint position was behind its parent joint, the parent needs to be rolled 180 degrees (0.5 rotations)
 					// otherwise the joint gets turned around and everything looks weird (twisted spines and knees and such)
