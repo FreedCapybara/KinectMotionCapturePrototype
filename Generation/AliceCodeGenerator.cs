@@ -101,7 +101,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 			StringBuilder result = new StringBuilder();
 
 			// get the pelvis
-			var pelvis = skeleton.Joints.First(joint => joint.JointType == JointType.HipCenter).Position;
+			var pelvis = skeleton.Joints[JointType.HipCenter].Position;
 			// set the pelvis as the original root if it hasn't been set yet (should happen on the first frame after init() only)
 			if (!originalRootPositionSet)
 			{
@@ -137,8 +137,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
 			for (int i = 0; i < boneData.Length; i++)
 			{
-				fromJoint = skeleton.Joints.First(joint => joint.JointType == boneData[i].KinectJointFrom).Position;
-				toJoint = skeleton.Joints.First(joint => joint.JointType == boneData[i].KinectJointTo).Position;
+				fromJoint = skeleton.Joints[boneData[i].KinectJointFrom].Position;
+				toJoint = skeleton.Joints[boneData[i].KinectJointTo].Position;
 				// adjust the position difference between the two joints so that it matches the length of the Alice joint
 				// to do this,
 				//		(1) get the difference [subtract],
