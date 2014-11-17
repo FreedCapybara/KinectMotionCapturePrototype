@@ -130,6 +130,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 		/// <returns>A string of Alice code that rotates the joints into their final positions according to the provided Kinect skeleton</returns>
 		public string GetJointsCode(Skeleton skeleton)
 		{
+			const double twoPi = Math.PI;
 			// compute the final positions for each joint and add the Alice code to the stringbuilder
 			SkeletonPoint fromJoint;
 			SkeletonPoint toJoint;
@@ -156,7 +157,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 				finalPositions[boneData[i].KinectJointTo] = finalPosition;
 
 				var rotation = skeleton.BoneOrientations[boneData[i].KinectJointFrom].HierarchicalRotation.Quaternion;
-				var rollAmount = rotation.Y;
+				var rollAmount = rotation.Y / twoPi;
 
 				// add the Alice code to the stringbuilder
 				// (ignore rotations from the neck and pelvis for now, which screw stuff up)
