@@ -211,7 +211,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         {
             if (recordingIsPlaying)
             {
-                Skeleton skeleton = recorder.GetFrame();
+                Skeleton skeleton = recorder.NextFrame();
 
                 using (DrawingContext dc = this.drawingGroup.Open())
                 {

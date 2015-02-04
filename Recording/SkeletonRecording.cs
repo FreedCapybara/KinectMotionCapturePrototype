@@ -11,6 +11,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 	{
 		private List<Skeleton> frames = new List<Skeleton>();
 		private IEnumerator<Skeleton> frameEnumerator;
+		private int currentFrame;
 
 		private AliceFileBuilder fileBuilder;
 
@@ -22,6 +23,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 		public void Clear()
 		{
 			frames.Clear();
+			frameEnumerator = null;
 		}
 
 		public void Capture(Skeleton skeleton)
@@ -29,16 +31,28 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 			frames.Add(skeleton);
 		}
 
-		public Skeleton GetFrame()
+		private void MoveToStart(int startIndex)
 		{
-			if (frameEnumerator == null)
-			{
-				frameEnumerator = frames.GetEnumerator();
-			}
+			CheckEnumerator();
 
-			if (!frameEnumerator.MoveNext())
+			frameEnumerator.Reset();
+			currentFrame = startIndex;
+			// move the enumerator to the start position
+			for (var i = 0; i < startIndex; i++)
 			{
-				frameEnumerator.Reset();
+				if (!frameEnumerator.MoveNext())
+					break;
+			}
+		}
+
+		public Skeleton NextFrame(int startIndex = 0, int? endIndex = null)
+		{
+			CheckEnumerator();
+			currentFrame++;
+
+			if (!frameEnumerator.MoveNext() || currentFrame >= (endIndex ?? frames.Count - 1))
+			{
+				MoveToStart(startIndex);
 				frameEnumerator.MoveNext();
 			}
 
@@ -60,6 +74,14 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 			}
 
 			fileBuilder.Finish();
+		}
+
+		private void CheckEnumerator()
+		{
+			if (frameEnumerator == null)
+			{
+				frameEnumerator = frames.GetEnumerator();
+			}
 		}
 	}
 }
