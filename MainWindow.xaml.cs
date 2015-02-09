@@ -211,7 +211,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         {
             if (recordingIsPlaying)
             {
-                Skeleton skeleton = recorder.NextFrame();
+                Skeleton skeleton = recorder.NextFrame((int)rangeSlider.LowerValue, (int)rangeSlider.HigherValue);
 
                 using (DrawingContext dc = this.drawingGroup.Open())
                 {
@@ -414,6 +414,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
             StartRecording.IsEnabled = false;
             StopRecording.IsEnabled = true;
+
+			rangeSlider.IsEnabled = false;
         }
 
         private void StopRecordingClicked(object sender, RoutedEventArgs e)
@@ -432,6 +434,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             StopRecording.IsEnabled = false;
             PlayRecording.IsEnabled = true;
             SaveRecording.IsEnabled = true;
+
+			rangeSlider.IsEnabled = true;
+			rangeSlider.LowerValue = 0;
+			rangeSlider.Maximum = recorder.FrameCount;
+			rangeSlider.HigherValue = rangeSlider.Maximum;
         }
 
         private void SaveRecordingClicked(object sender, RoutedEventArgs e)

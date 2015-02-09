@@ -15,6 +15,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
 		private AliceFileBuilder fileBuilder;
 
+		public int FrameCount
+		{
+			get { return frames.Count; }
+		}
+
 		public SkeletonRecorder()
 		{
 			fileBuilder = new AliceFileBuilder();
