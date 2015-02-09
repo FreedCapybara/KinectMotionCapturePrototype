@@ -64,7 +64,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 			return frameEnumerator.Current;
 		}
 
-		public void Export(string filename)
+		public void Export(string filename, int startIndex = 0, int? endIndex = null)
 		{
 			if (frames.Count == 0)
 			{
@@ -73,7 +73,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
 			fileBuilder.Prepare();
 
-			foreach (var skeleton in frames)
+			var exportFrames = frames.GetRange(startIndex, (endIndex ?? frames.Count - 1) - startIndex);
+			foreach (var skeleton in exportFrames)
 			{
 				fileBuilder.ApplyFrame(skeleton);
 			}

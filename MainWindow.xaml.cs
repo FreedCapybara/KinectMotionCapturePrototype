@@ -412,8 +412,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             isRecording = true;
             recordingIsPlaying = false;
 
-            StartRecording.IsEnabled = false;
             StopRecording.IsEnabled = true;
+            StartRecording.IsEnabled = false;
+			SaveRecording.IsEnabled = false;
+			PlayRecording.IsEnabled = false;
 
 			rangeSlider.IsEnabled = false;
         }
@@ -423,6 +425,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             if (isRecording)
             {
                 isRecording = false;
+
+				rangeSlider.IsEnabled = true;
+				rangeSlider.LowerValue = 0;
+				rangeSlider.Maximum = recorder.FrameCount;
+				rangeSlider.HigherValue = rangeSlider.Maximum;
             }
 
             if (recordingIsPlaying)
@@ -434,16 +441,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             StopRecording.IsEnabled = false;
             PlayRecording.IsEnabled = true;
             SaveRecording.IsEnabled = true;
-
-			rangeSlider.IsEnabled = true;
-			rangeSlider.LowerValue = 0;
-			rangeSlider.Maximum = recorder.FrameCount;
-			rangeSlider.HigherValue = rangeSlider.Maximum;
         }
 
         private void SaveRecordingClicked(object sender, RoutedEventArgs e)
         {
-            recorder.Export("export.txt");
+            recorder.Export("export.txt", (int)rangeSlider.LowerValue, (int)rangeSlider.HigherValue);
         }
 
         private void PlayRecordingClicked(object sender, RoutedEventArgs e)
@@ -453,7 +455,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             StartRecording.IsEnabled = false;
             StopRecording.IsEnabled = true;
             PlayRecording.IsEnabled = false;
-            SaveRecording.IsEnabled = false;
+            SaveRecording.IsEnabled = true;
         }
     }
 }
