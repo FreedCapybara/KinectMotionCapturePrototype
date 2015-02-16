@@ -64,7 +64,18 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 			return frameEnumerator.Current;
 		}
 
-		public void Export(string filename, int startIndex = 0, int? endIndex = null)
+		public void ConfigureOutput(string fullPath)
+		{
+			var animationName = Path.GetFileNameWithoutExtension(fullPath);
+			if (!string.IsNullOrWhiteSpace(animationName))
+			{
+				fileBuilder.AnimationClassName = animationName;
+			}
+
+			fileBuilder.OutputDirectory = Path.GetDirectoryName(fullPath);
+		}
+
+		public void Export(int startIndex = 0, int? endIndex = null)
 		{
 			if (frames.Count == 0)
 			{

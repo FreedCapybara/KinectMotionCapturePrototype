@@ -11,6 +11,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
     using System.Windows.Media;
     using Microsoft.Kinect;
     using System.Windows.Controls;
+	using Microsoft.Win32;
 
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -426,11 +427,18 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             {
                 isRecording = false;
 
+				if (recorder.FrameCount == 0)
+				{
+					StartRecording.IsEnabled = true;
+					StopRecording.IsEnabled = false;
+					return;
+				}
+
 				rangeSlider.IsEnabled = true;
 				rangeSlider.LowerValue = 0;
+				rangeSlider.HigherValue = recorder.FrameCount;
 				rangeSlider.Maximum = recorder.FrameCount;
-				rangeSlider.HigherValue = rangeSlider.Maximum;
-            }
+			}
 
             if (recordingIsPlaying)
             {
@@ -445,7 +453,15 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
         private void SaveRecordingClicked(object sender, RoutedEventArgs e)
         {
-            recorder.Export("export.txt", (int)rangeSlider.LowerValue, (int)rangeSlider.HigherValue);
+			var fileDialog = new OpenFileDialog();
+			fileDialog.CheckFileExists = false;
+			fileDialog.FileName += "KinectAnimation.jar";
+			fileDialog.Filter = ".JAR files (*.jar)|*.jar|All files (*.*)|*.*";
+			if (fileDialog.ShowDialog() == true)
+			{
+				recorder.ConfigureOutput(fileDialog.FileName);
+				recorder.Export((int)rangeSlider.LowerValue, (int)rangeSlider.HigherValue);
+			}
         }
 
         private void PlayRecordingClicked(object sender, RoutedEventArgs e)

@@ -148,7 +148,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 			ProcessStartInfo startInfo = new ProcessStartInfo();
 			startInfo.WindowStyle = ProcessWindowStyle.Hidden;
 			startInfo.FileName = "powershell.exe";
-			startInfo.Arguments = string.Format("./AliceBuild/build.ps1 {0}", AnimationClassName);
+			startInfo.Arguments = string.Format("./AliceBuild/build.ps1 {0} {1}", OutputDirectory, AnimationClassName);
 			process.StartInfo = startInfo;
 			process.Start();
 		}
