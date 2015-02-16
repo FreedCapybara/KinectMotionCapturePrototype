@@ -116,7 +116,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 			var outputFileName = string.Format("src/{0}/{1}.java", package, AnimationClassName);
 			using (StreamWriter outfile = new StreamWriter(outputFileName, false))
 			{
-				outfile.Write(string.Format(animationTemplate, currentSegment + 1));
+				outfile.Write(string.Format(animationTemplate, AnimationClassName, currentSegment + 1));
 			}
 			// copy the interface to the output directory
 			var outputFile = string.Format("src/{0}/IAnimator.java", package);

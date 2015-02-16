@@ -9,12 +9,12 @@ import org.lgna.story.SScene;
  * Provides an interface for playing animations created with Kinect.
  * @author andrew
  */
-public class KinectAnimation implements IAnimator {{
+public class {0} implements IAnimator {{
 
 	List<IAnimator> animationSegments = new ArrayList<IAnimator>();
-	int totalSegments = {0};
+	int totalSegments = {1};
 	
-	public KinectAnimation(SScene scene) {{
+	public {0}(SScene scene) {{
 		try {{
 			for (int i = 0; i < totalSegments; i++) {{
 				Class segmentClass = Class.forName("edu.calvin.cs.alicekinect.AnimationSegment" + i);
