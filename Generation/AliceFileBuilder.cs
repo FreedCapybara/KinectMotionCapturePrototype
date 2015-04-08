@@ -1,4 +1,5 @@
-﻿using Microsoft.Kinect;
+﻿using edu.calvin.cs.alicekinect;
+using Microsoft.Kinect;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -22,7 +23,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
 		private AliceCodeGenerator aliceGenerator;
 
-		private StringBuilder sb = new StringBuilder();
+		private AliceKinect aliceKinect = new AliceKinect();
 		private int currentFrame;
 		private int currentSegment;
 
@@ -42,39 +43,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 		public void Prepare()
 		{
 			// clear the string builder and initialize frame and segment counts
-			sb.Clear();
+			aliceKinect.reset();
 			currentFrame = 0;
 			currentSegment = 0;
-
-			// load the templates if they haven't already been loaded
-			if (animationTemplate == null)
-			{
-				using (StreamReader reader = new StreamReader("AliceTemplates/KinectAnimation.java"))
-				{
-					animationTemplate = reader.ReadToEnd();
-				}
-			}
-
-			if (segmentTemplate == null)
-			{
-				using (StreamReader reader = new StreamReader("AliceTemplates/AnimationSegment.java"))
-				{
-					segmentTemplate = reader.ReadToEnd();
-				}
-			}
-
-			// set up the output directories
-			try
-			{
-				Directory.Delete("src", true);
-				Directory.Delete("build", true);
-			}
-			catch (Exception)
-			{
-			}
-			Directory.CreateDirectory(OutputDirectory);
-			Directory.CreateDirectory(string.Format("src/{0}", package));
-			Directory.CreateDirectory("build");
 		}
 
 		/// <summary>
@@ -91,9 +62,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 				return;
 			}
 
-			sb.Append(aliceGenerator.GetMovementCode(skeleton));
-			sb.Append(aliceGenerator.GetJointsCode(skeleton));
-			sb.Append("box.delay(0.0166);\n"); // delay 1/60s each frame
+			aliceGenerator.GetMovementCode(skeleton, aliceKinect);
+			aliceGenerator.GetJointsCode(skeleton, aliceKinect);
+			aliceKinect.addDelay(0.0166);
 
 			currentFrame++;
 			// write an animation segment if we reach the maximum number of frames for a segment
@@ -110,32 +81,18 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 		/// </summary>
 		public void Finish()
 		{
-			// write any remaining contents of the stringbuilder
+			// Export the skeleton data to .a3c
 			WriteSB();
-			// write the total number of segments (currentSegment + 1) to the KinectAnimation template
-			var outputFileName = string.Format("src/{0}/{1}.java", package, AnimationClassName);
-			using (StreamWriter outfile = new StreamWriter(outputFileName, false))
-			{
-				outfile.Write(string.Format(animationTemplate, AnimationClassName, currentSegment + 1));
-			}
-			// copy the interface to the output directory
-			var outputFile = string.Format("src/{0}/IAnimator.java", package);
-			File.Copy("AliceTemplates/IAnimator.java", outputFile, true);
-			// compile the sources and create a jar file
-			RunBuildScript();
 		}
 
 		/// <summary>
-		/// Helper method that writes the StringBuilder's contents to an AnimationSegment file and clears its contents.
+		/// Helper method that writes the AST built by AliceKinect and clears it.
 		/// </summary>
 		private void WriteSB()
 		{
-			var fileName = string.Format("src/{0}/AnimationSegment{1}.java", package, currentSegment);
-			using (StreamWriter outfile = new StreamWriter(fileName, false))
-			{
-				outfile.Write(string.Format(segmentTemplate, currentSegment, sb.ToString()));
-			}
-			sb.Clear();
+			var fileName = string.Format("{0}/{1}{2}.a3c", OutputDirectory, AnimationClassName, currentSegment);
+			aliceKinect.export(fileName, AnimationClassName);
+			aliceKinect.reset();
 		}
 
 		/// <summary>

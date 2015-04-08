@@ -1,4 +1,6 @@
-﻿using Microsoft.Kinect;
+﻿using edu.calvin.cs.alicekinect;
+using Microsoft.Kinect;
+using org.lgna.story;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -97,10 +99,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 		/// </summary>
 		/// <param name="skeleton">The Kinect skeleton to calculate movements from</param>
 		/// <returns>A string of Alice code that executes a Biped's movements</returns>
-		public string GetMovementCode(Skeleton skeleton)
+		public void GetMovementCode(Skeleton skeleton, AliceKinect aliceKinect)
 		{
-			StringBuilder result = new StringBuilder();
-
 			// get the pelvis
 			var pelvis = skeleton.Joints[JointType.HipCenter].Position;
 			// set the pelvis as the original root if it hasn't been set yet (should happen on the first frame after init() only)
@@ -115,11 +115,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 			// this moving algorithm attempts to use absolute positioning rather than relative positioning (adjusting based on the previous position)
 			// in order to stop Alice characters from drifting away after the animation has run a few iterations
 			// 1. move a box that does not have the biped as a vehicle to the desired position
-			result.Append(string.Format("root.setPositionRelativeToVehicle(new Position(0, {0}, 0), Move.duration(0));", moveDifference.Y));
+			aliceKinect.addSetRootPositionRelativeToVehicle(0, moveDifference.Y, 0);
 			// 2. move the person to the box
-			result.Append("biped.moveTo(root, MoveTo.duration(0));\n");
-
-			return result.ToString();
+			aliceKinect.addMoveToRoot();
 		}
 
 		/// <summary>
@@ -128,14 +126,13 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 		/// </summary>
 		/// <param name="skeleton">The Kinect skeleton to calculate joint rotations from</param>
 		/// <returns>A string of Alice code that rotates the joints into their final positions according to the provided Kinect skeleton</returns>
-		public string GetJointsCode(Skeleton skeleton)
+		public void GetJointsCode(Skeleton skeleton, AliceKinect aliceKinect)
 		{
 			const double twoPi = Math.PI;
 			// compute the final positions for each joint and add the Alice code to the stringbuilder
 			SkeletonPoint fromJoint;
 			SkeletonPoint toJoint;
 			SkeletonPoint adjustedDifference;
-			StringBuilder result = new StringBuilder();
 
 			for (int i = 0; i < boneData.Length; i++)
 			{
@@ -164,25 +161,18 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 				if (!ignore.Contains(boneData[i].AliceJointFrom))
 				{
 					// position the box and point the joint at it
-					result.Append(string.Format("box.setPositionRelativeToVehicle(new Position({0}, {1}, {2}), Move.duration(0));biped.get{3}().pointAt(box, PointAt.duration(0));\n",
-						finalPosition.X, finalPosition.Y, finalPosition.Z,
-						boneData[i].AliceJointFrom
-					));
+					aliceKinect.addSetBoxPositionRelativeToVehicle(finalPosition.X, finalPosition.Y, finalPosition.Z);
+					aliceKinect.addPointAt(boneData[i].AliceJointFrom);
 					// roll the bone to match the Kinect data
-					result.Append(string.Format("biped.get{0}().roll(RollDirection.{1}, {2}, Roll.duration(0));\n",
-						boneData[i].AliceJointFrom,
-						finalPosition.X > 0 ? "LEFT" : "RIGHT",
-						rollAmount
-					));
-					//// if the final joint position was behind its parent joint, the parent needs to be rolled 180 degrees (0.5 rotations)
-					//// otherwise the joint gets turned around and everything looks weird (twisted spines and knees and such)
+					aliceKinect.addRoll(boneData[i].AliceJointFrom, rollAmount, finalPosition.X > 0 ? RollDirection.LEFT : RollDirection.RIGHT);
+					// if the final joint position was behind its parent joint, the parent needs to be rolled 180 degrees (0.5 rotations)
+					// otherwise the joint gets turned around and everything looks weird (twisted spines and knees and such)
 					if (finalPosition.Z > 0 && !rotationIgnore.Contains(boneData[i].AliceJointFrom))
 					{
-						result.Append(string.Format("biped.get{0}().roll(RollDirection.LEFT, 0.5, Roll.duration(0));\n", boneData[i].AliceJointFrom));
+						aliceKinect.addRoll(boneData[i].AliceJointFrom, 0.5, RollDirection.LEFT);
 					}
 				}
 			}
-			return result.ToString();
 		}
 
 	}

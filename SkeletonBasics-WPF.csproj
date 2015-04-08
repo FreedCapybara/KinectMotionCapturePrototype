@@ -39,6 +39,9 @@
     <ApplicationIcon>Images\Kinect.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="a3c-example">
+      <HintPath>..\..\..\IdeaProjects\A3C-Example-Workspace\a3c-example.dll</HintPath>
+    </Reference>
     <Reference Include="IKVM.AWT.WinForms">
       <HintPath>packages\IKVM.8.0.5449.1\lib\IKVM.AWT.WinForms.dll</HintPath>
     </Reference>
@@ -55,7 +58,7 @@
       <HintPath>packages\IKVM.8.0.5449.1\lib\IKVM.OpenJDK.Corba.dll</HintPath>
     </Reference>
     <Reference Include="IKVM.OpenJDK.Core">
-      <HintPath>packages\IKVM.8.0.5449.1\lib\IKVM.OpenJDK.Core.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\IKVM\ikvmbin-8.1.5561\bin\IKVM.OpenJDK.Core.dll</HintPath>
     </Reference>
     <Reference Include="IKVM.OpenJDK.Jdbc">
       <HintPath>packages\IKVM.8.0.5449.1\lib\IKVM.OpenJDK.Jdbc.dll</HintPath>
