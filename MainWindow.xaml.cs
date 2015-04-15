@@ -455,8 +455,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         {
 			var fileDialog = new OpenFileDialog();
 			fileDialog.CheckFileExists = false;
-			fileDialog.FileName += "KinectAnimation.jar";
-			fileDialog.Filter = ".JAR files (*.jar)|*.jar|All files (*.*)|*.*";
+			fileDialog.FileName += "KinectAnimation.a3c";
+			fileDialog.Filter = ".A3C files (*.a3c)|*.a3c|All files (*.*)|*.*";
 			if (fileDialog.ShowDialog() == true)
 			{
 				recorder.ConfigureOutput(fileDialog.FileName);

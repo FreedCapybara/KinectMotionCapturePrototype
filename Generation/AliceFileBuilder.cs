@@ -23,7 +23,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
 		private AliceCodeGenerator aliceGenerator;
 
-		private AliceKinect aliceKinect = new AliceKinect();
+		private AliceKinect aliceKinect = new AliceKinect(@"C:\Users\andrew\Documents\IdeaProjects\A3C-Example-Workspace\a3c-example\input\Box.a3c");
 		private int currentFrame;
 		private int currentSegment;
 
@@ -91,7 +91,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 		private void WriteSB()
 		{
 			var fileName = string.Format("{0}/{1}{2}.a3c", OutputDirectory, AnimationClassName, currentSegment);
-			aliceKinect.export(fileName, AnimationClassName);
+			aliceKinect.export(fileName);
 			aliceKinect.reset();
 		}
 
