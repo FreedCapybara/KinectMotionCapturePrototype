@@ -23,12 +23,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
 		private AliceCodeGenerator aliceGenerator;
 
-		private AliceKinect aliceKinect = new AliceKinect(@"C:\Users\andrew\Documents\IdeaProjects\A3C-Example-Workspace\a3c-example\input\Box.a3c");
+		private AliceKinect aliceKinect = new AliceKinect(@"C:\Users\andrew\Documents\IdeaProjects\A3C-Example-Workspace\a3c-example\input\AdultPerson.a3c");
 		private int currentFrame;
 		private int currentSegment;
-
-		private string segmentTemplate; // {0} segment number, {1} data
-		private string animationTemplate; // {0} number of segments
 
 		public AliceFileBuilder(int framesPerSegment = 25, int maxSegments = 50, string animationClassName = "KinectAnimation", string outputDirectory = ".")
 		{
@@ -57,7 +54,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 		/// <param name="skeleton">A skeleton representing a frame of the animation</param>
 		public void ApplyFrame(Skeleton skeleton)
 		{
-			if (currentSegment > MaxSegments)
+			if (currentSegment >= MaxSegments)
 			{
 				return;
 			}

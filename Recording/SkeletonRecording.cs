@@ -22,7 +22,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
 		public SkeletonRecorder()
 		{
-			fileBuilder = new AliceFileBuilder();
+			fileBuilder = new AliceFileBuilder(framesPerSegment: 200, maxSegments: 1);
 		}
 
 		public void Clear()
@@ -90,7 +90,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 				fileBuilder.ApplyFrame(skeleton);
 			}
 
-			fileBuilder.Finish();
+			//fileBuilder.Finish();
 		}
 
 		private void CheckEnumerator()
