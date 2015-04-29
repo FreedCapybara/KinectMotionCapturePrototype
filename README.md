@@ -8,10 +8,10 @@ Simple motion capture program for the XBox Kinect that generates Alice 3 classes
 1. Run the program with an Xbox Kinect connected to your machine (only tested with Kinect v1.8).
 2. Click `Start` in the bottom right corner to begin recording, and `Stop` to end the recording.
 3. Once a movement has been recorded, click `Save` to generate an Alice 3 class in the desired location.
-4. In Alice, go to `Setup Scene `>` 'My Classes' tab `>` new ... from KinectAnimation.a3c`
-5. With the library referenced you should be able to add lines like this to your Alice project in NetBeans to use it:
+4. In Alice, go to `Setup Scene `>` 'My Classes' tab `>` new ... from KinectAnimation.a3c` and drag it into the scene
+5. In the 'Edit Code' window you should be able to drag the animate method into the editor to get something like this:
 ```java
-myBiped.animate(scene); // runs the animation
+myBiped.animate(this); // runs the animation on the scene
 ```
 
 Demo on YouTube: https://www.youtube.com/watch?v=V-aHkEUg5ps (shows the old NetBeans implementation, but the animation looks the same)
