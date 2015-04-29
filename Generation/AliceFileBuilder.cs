@@ -10,7 +10,10 @@ using System.Text;
 namespace Microsoft.Samples.Kinect.SkeletonBasics
 {
 	/// <summary>
-	/// Exports, compiles, and creates a jar from Java classes containing animation code for use in Alice.
+	/// Handles generation and exporting of Alice classes.
+	/// 
+	/// Uses the Java AliceKinect class to build and export an AST containing all the animation code for a biped.
+	/// Requires an Alice Biped class from a .a3c file as input.
 	/// </summary>
 	class AliceFileBuilder
 	{
@@ -23,33 +26,33 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
 		private AliceCodeGenerator aliceGenerator;
 
-		private AliceKinect aliceKinect = new AliceKinect(@"C:\Users\andrew\Documents\IdeaProjects\A3C-Example-Workspace\a3c-example\input\AdultPerson.a3c");
+		private AliceKinect aliceKinect;
 		private int currentFrame;
 		private int currentSegment;
 
-		public AliceFileBuilder(int framesPerSegment = 25, int maxSegments = 50, string animationClassName = "KinectAnimation", string outputDirectory = ".")
+		public AliceFileBuilder(String inputAliceClassFile = @"Alice\AdultPerson.a3c", int framesPerSegment = 25, int maxSegments = 50, string animationClassName = "KinectAnimation", string outputDirectory = ".")
 		{
 			aliceGenerator = new AliceCodeGenerator();
-			// note: it's approx. 10 lines of code per frame
+			aliceKinect = new AliceKinect(inputAliceClassFile);
+			// note: it's approx. 10 statements per frame
 			FramesPerSegment = framesPerSegment;
 			MaxSegments = maxSegments;
 			AnimationClassName = animationClassName;
 			OutputDirectory = outputDirectory;
 		}
 
+		/// <summary>
+		/// Clears all frames and resets the frame and segment counts
+		/// </summary>
 		public void Prepare()
 		{
-			// clear the string builder and initialize frame and segment counts
 			aliceKinect.reset();
 			currentFrame = 0;
 			currentSegment = 0;
 		}
 
 		/// <summary>
-		/// Adds one animation frame to the exportable code.
-		/// When the number of frames processed surpasses the number of frames in a segment,
-		/// all the code generated is written to a Java class (AnimationSegmentX.java where X is the segment number)
-		/// and the next segment is started.  The goal is to make a large group of classes to avoid Java 'code too large' compiler errors.
+		/// Applies a Kinect Skeleton to one frame of animation in Alice.
 		/// </summary>
 		/// <param name="skeleton">A skeleton representing a frame of the animation</param>
 		public void ApplyFrame(Skeleton skeleton)
@@ -74,7 +77,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 		}
 
 		/// <summary>
-		/// Finalizes the animation, then compiles and jars it.
+		/// Finalizes the animation.
 		/// </summary>
 		public void Finish()
 		{
@@ -87,24 +90,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 		/// </summary>
 		private void WriteSB()
 		{
-			var fileName = string.Format("{0}/{1}{2}.a3c", OutputDirectory, AnimationClassName, currentSegment);
+			var fileName = string.Format("{0}/{1}{2}.a3c", OutputDirectory, AnimationClassName, currentSegment == 0 ? "" : currentSegment.ToString());
 			aliceKinect.export(fileName);
 			aliceKinect.reset();
-		}
-
-		/// <summary>
-		/// Runs a Powershell script to compile and jar the generated source code.
-		/// </summary>
-		//http://stackoverflow.com/questions/1469764/run-command-prompt-commands
-		private void RunBuildScript()
-		{
-			Process process = new Process();
-			ProcessStartInfo startInfo = new ProcessStartInfo();
-			startInfo.WindowStyle = ProcessWindowStyle.Hidden;
-			startInfo.FileName = "powershell.exe";
-			startInfo.Arguments = string.Format("./AliceBuild/build.ps1 {0} {1}", OutputDirectory, AnimationClassName);
-			process.StartInfo = startInfo;
-			process.Start();
 		}
 	}
 }

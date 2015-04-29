@@ -10,7 +10,16 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 {
 	/// <summary>
 	/// Generates code for Alice animation methods from Kinect skeletons,
-	/// adjusting for Alice bone lengths to produce accurate animations.
+	/// adjusting for Alice bone lengths to produce more accurate animations.
+	/// 
+	/// Alice Bipeds are animated with invisible scene objects that are placed relative to an Alice Biped according to Kinect data.
+	/// The algorithm is something like the following:
+	/// 
+	///		For every skeletonJoint in a sequence of joints:
+	///			(1) position an object at the coordinates of the joint from the Kinect data
+	///			(2) point the corresponding Alice Biped joint at the object
+	///			(3) -optional- rotate the joint as necessary to make it look more normal
+	///	
 	/// </summary>
 	class AliceCodeGenerator
 	{
@@ -42,8 +51,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 		private string rotationIgnore = "LeftShoulder RightShoulder";
 
 		/// <summary>
-		/// The data in this array specifies (1) the order in which the joints are processed
-		/// and (2) the length of each bone for improved animation accuracy when translating the movements to Alice.
+		/// The data in this array specifies
+		/// (1) the order in which the joints are processed, and
+		/// (2) the length of each bone for improved animation accuracy when translating the movements to Alice,
 		/// </summary>
 		private JointData[] boneData = new JointData[16] {
 			new JointData("SpineBase", JointType.HipCenter, JointType.ShoulderCenter, 0.4375f),
@@ -156,7 +166,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 				var rotation = skeleton.BoneOrientations[boneData[i].KinectJointFrom].HierarchicalRotation.Quaternion;
 				var rollAmount = rotation.Y / twoPi;
 
-				// add the Alice code to the stringbuilder
+				// add the Alice code
 				// (ignore rotations from the neck and pelvis for now, which screw stuff up)
 				if (!ignore.Contains(boneData[i].AliceJointFrom))
 				{

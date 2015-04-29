@@ -15,6 +15,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
     /// <summary>
     /// Interaction logic for MainWindow.xaml
+	/// 
+	/// Most of this is boilerplate.  The important methods are SensorSkeletonFrameReady
+	/// and all the recording button callbacks towards the bottom.
     /// </summary>
     public partial class MainWindow : Window
     {
@@ -210,10 +213,13 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <param name="e">event arguments</param>
         private void SensorSkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
         {
+			// splice in the playback stuff
             if (recordingIsPlaying)
             {
+				// only do playback between the frame slider values
                 Skeleton skeleton = recorder.NextFrame((int)rangeSlider.LowerValue, (int)rangeSlider.HigherValue);
 
+				// draw the black background and current skeleton frame
                 using (DrawingContext dc = this.drawingGroup.Open())
                 {
                     dc.DrawRectangle(Brushes.Black, null, new Rect(0.0, 0.0, RenderWidth, RenderHeight));
@@ -223,6 +229,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                         RenderSkeleton(dc, skeleton);
                     }
                 }
+				// kick out
                 return;
             }
 
@@ -246,8 +253,14 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 {
                     foreach (Skeleton skel in skeletons)
                     {
-                        RenderSkeleton(dc, skel);
-                    }
+						RenderSkeleton(dc, skel);
+
+						// capture the current skeleton during recording
+						if (isRecording)
+						{
+							recorder.Capture(skel);
+						}
+					}
                 }
 
                 // prevent drawing outside of our render area
@@ -262,12 +275,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             if (skel.TrackingState == SkeletonTrackingState.Tracked)
             {
                 this.DrawBonesAndJoints(skel, dc);
-
-                // capture the current skeleton
-                if (isRecording)
-                {
-                    recorder.Capture(skel);
-                }
             }
             else if (skel.TrackingState == SkeletonTrackingState.PositionOnly)
             {
@@ -451,6 +458,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             SaveRecording.IsEnabled = true;
         }
 
+		/// <summary>
+		/// Open a file dialog for the user to save their recording, then export it.
+		/// </summary>
         private void SaveRecordingClicked(object sender, RoutedEventArgs e)
         {
 			var fileDialog = new OpenFileDialog();
