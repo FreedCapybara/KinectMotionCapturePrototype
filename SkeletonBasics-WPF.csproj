@@ -210,11 +210,11 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Content Include="Alice\AliceKinect.dll" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <Content Include="Alice\AliceKinect.dll" />
     <Content Include="Alice\AdultPerson.a3c">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

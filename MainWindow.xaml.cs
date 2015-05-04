@@ -12,6 +12,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
     using Microsoft.Kinect;
     using System.Windows.Controls;
 	using Microsoft.Win32;
+	using System.Threading.Tasks;
 
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -253,14 +254,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 {
                     foreach (Skeleton skel in skeletons)
                     {
-						RenderSkeleton(dc, skel);
-
-						// capture the current skeleton during recording
-						if (isRecording)
-						{
-							recorder.Capture(skel);
-						}
-					}
+                        RenderSkeleton(dc, skel);
+                    }
                 }
 
                 // prevent drawing outside of our render area
@@ -275,6 +270,12 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             if (skel.TrackingState == SkeletonTrackingState.Tracked)
             {
                 this.DrawBonesAndJoints(skel, dc);
+
+                // capture the current skeleton
+                if (isRecording)
+                {
+                    recorder.Capture(skel);
+                }
             }
             else if (skel.TrackingState == SkeletonTrackingState.PositionOnly)
             {

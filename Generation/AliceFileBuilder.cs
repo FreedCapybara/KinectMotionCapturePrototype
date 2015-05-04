@@ -70,7 +70,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 			// write an animation segment if we reach the maximum number of frames for a segment
 			if (currentFrame > FramesPerSegment)
 			{
-				WriteSB();
+				//WriteSB();
 				currentFrame = 0;
 				currentSegment++;
 			}
